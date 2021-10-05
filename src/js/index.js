@@ -52,56 +52,56 @@ function call_create_payment(nonce, data, billingPostalCode) {
     .then(response => data.payment_id = response['payment']['id']);
 }
 
-const cardPaymentForm = new SqPaymentForm({
-  applicationId: '#{ square_application_id }',
-  card: { elementId: 'sq-card' },
-  callbacks: {
-    cardNonceResponseReceived: function(errors, nonce, paymentData, contacts) {
-      if (!errors) {
-        call_create_payment(nonce, data);
-      }
-    }
-  }
-});
-cardPaymentForm.build();
+// const cardPaymentForm = new SqPaymentForm({
+//   applicationId: '#{ square_application_id }',
+//   card: { elementId: 'sq-card' },
+//   callbacks: {
+//     cardNonceResponseReceived: function(errors, nonce, paymentData, contacts) {
+//       if (!errors) {
+//         call_create_payment(nonce, data);
+//       }
+//     }
+//   }
+// });
+// cardPaymentForm.build();
 
-if (document.getElementById('sq-google-pay') !== null) {
-  const gPayPaymentForm = new SqPaymentForm({
-    applicationId: '#{ square_application_id }',
-    locationId: LOCATION_ID,
-    googlePay: { elementId: 'sq-google-pay' },
-    callbacks: {
-      cardNonceResponseReceived: function(errors, nonce, paymentData, contacts) {
-        if (!errors) {
-          call_create_payment(nonce, data);
-        }
-      },
-      methodsSupported: function(methods, unsupportedReason) {
-        var googlePayBtn = document.getElementById('sq-google-pay');
+// if (document.getElementById('sq-google-pay') !== null) {
+//   const gPayPaymentForm = new SqPaymentForm({
+//     applicationId: '#{ square_application_id }',
+//     locationId: LOCATION_ID,
+//     googlePay: { elementId: 'sq-google-pay' },
+//     callbacks: {
+//       cardNonceResponseReceived: function(errors, nonce, paymentData, contacts) {
+//         if (!errors) {
+//           call_create_payment(nonce, data);
+//         }
+//       },
+//       methodsSupported: function(methods, unsupportedReason) {
+//         var googlePayBtn = document.getElementById('sq-google-pay');
 
-        if (methods.googlePay === true) {
-          googlePayBtn.style.display = 'inline-block';
-        } else {
-          console.log(unsupportedReason.message);
-        }
-      },
-      createPaymentRequest: function() {
-        let paymentRequestJson = {
-          requestBillingAddress: true,
-          currencyCode: 'USD',
-          countryCode: 'US',
-          total: {
-            label: 'TOTAL AMOUNT',
-            amount: compute_total_price(data.rental_length, data.delivery_tip),
-            pending: false
-          }
-        };
-        return paymentRequestJson;
-      }
-    }
-  });
-  gPayPaymentForm.build();
-}
+//         if (methods.googlePay === true) {
+//           googlePayBtn.style.display = 'inline-block';
+//         } else {
+//           console.log(unsupportedReason.message);
+//         }
+//       },
+//       createPaymentRequest: function() {
+//         let paymentRequestJson = {
+//           requestBillingAddress: true,
+//           currencyCode: 'USD',
+//           countryCode: 'US',
+//           total: {
+//             label: 'TOTAL AMOUNT',
+//             amount: compute_total_price(data.rental_length, data.delivery_tip),
+//             pending: false
+//           }
+//         };
+//         return paymentRequestJson;
+//       }
+//     }
+//   });
+//   gPayPaymentForm.build();
+// }
 
 ////////////////////
 // Google Pay Direct
@@ -139,26 +139,26 @@ const cardPaymentMethod = Object.assign(
 
 let googlePaymentsClient;
 
-function doGoogleStuff() {
-  googlePaymentsClient = new google.payments.api.PaymentsClient({
-    environment: '#{ google_pay_env }',
-    paymentDataCallbacks: { onPaymentAuthorized: onPaymentAuthorized }
-  });
-  const isReadyToPayRequest = Object.assign({}, baseGooglePayRequest);
-  isReadyToPayRequest.allowedPaymentMethods = [baseCardPaymentMethod];
-  googlePaymentsClient.isReadyToPay(isReadyToPayRequest)
-    .then(function(response) {
-      if (response.result) {
-        const button = googlePaymentsClient.createButton(
-          { onClick: onGooglePaymentButtonClicked }
-        );
-        document.getElementById('google-pay-direct').appendChild(button);
-      }
-    })
-    .catch(function(err) {
-      console.log(err);
-    })
-}
+// function doGoogleStuff() {
+//   googlePaymentsClient = new google.payments.api.PaymentsClient({
+//     environment: '#{ google_pay_env }',
+//     paymentDataCallbacks: { onPaymentAuthorized: onPaymentAuthorized }
+//   });
+//   const isReadyToPayRequest = Object.assign({}, baseGooglePayRequest);
+//   isReadyToPayRequest.allowedPaymentMethods = [baseCardPaymentMethod];
+//   googlePaymentsClient.isReadyToPay(isReadyToPayRequest)
+//     .then(function(response) {
+//       if (response.result) {
+//         const button = googlePaymentsClient.createButton(
+//           { onClick: onGooglePaymentButtonClicked }
+//         );
+//         document.getElementById('google-pay-direct').appendChild(button);
+//       }
+//     })
+//     .catch(function(err) {
+//       console.log(err);
+//     })
+// }
 
 function getGooglePaymentDataRequest() {
   const paymentDataRequest = Object.assign({}, baseGooglePayRequest);

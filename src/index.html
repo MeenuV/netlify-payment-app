@@ -8,12 +8,42 @@
     <link rel="stylesheet" type="text/css" href="mysqpaymentform.css">
 
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-    <script defer
-            type="text/javascript"
-            src="#{ square_payment_form_script_base_path }/v2/paymentform">
+    <!-- <script defer -->
+    <!--         type="text/javascript" -->
+    <!--         src="#{ square_payment_form_script_base_path }/v2/paymentform"></script> -->
+    <script type="text/javascript"
+            src="#{ web_payments_sdk_script_base_path }/v1/square.js"></script>
+    <script>
+      const appId = '#{ square_application_id }';
+      const locationId = '#{ square_location_id }';
+      async function initializeCard(payments) {
+        console.log('INITIALIZING CARD PART 1');
+        const card = await payments.card();
+        console.log('INITIALIZING CARD PART 2');
+        await card.attach('#card-container');
+        console.log('INITIALIZING CARD PART 3');
+        return card;
+      }
+
+      document.addEventListener('DOMContentLoaded', async function() {
+        console.log("INSIDE THE EVENT LISTENER");
+        if (!window.Square) {
+          throw new Error('Square.js failed to load properly.');
+        }
+        const payments = window.Square.payments(appId, locationId);
+        console.log("PAYMENTS", payments);
+        let card;
+        try {
+           card = await initializeCard(payments);
+        } catch (e) {
+          console.error('Initializing Card failed', e);
+          return;
+        }
+      }
+
     </script>
     <script defer src="/js/index.js"></script>
-    <script defer src="https://pay.google.com/gp/p/js/pay.js" onload="doGoogleStuff()"></script>
+    <!-- <script defer src="https://pay.google.com/gp/p/js/pay.js" onload="doGoogleStuff()"></script> -->
   </head>
   <body>
     <section class="section">
@@ -116,18 +146,24 @@
                     </p>
                 </div>
               </div>
+              <!-- <div class="form-container"> -->
+              <!--   <h3>Google Pay Direct!</h3> -->
+              <!--   <div id="google-pay-direct"></div> -->
+              <!--   <\!-- <h3>Google Pay-PaymentForm</h3> -\-> -->
+              <!--   <\!-- <div> -\-> -->
+              <!--   <\!--   <button id="sq-google-pay" class="button-google-pay"></button> -\-> -->
+              <!--   <\!-- </div> -\-> -->
+              <!--   <h3>Pay With Card</h3> -->
+              <!--   <div id="sq-card"></div> -->
+              <!--   <button class="button-credit-card" v-on:click="submitCardClick"> -->
+              <!--     Pay ${{ total_price }} -->
+              <!--   </button> -->
+              <!-- </div> -->
               <div class="form-container">
-                <h3>Google Pay Direct!</h3>
-                <div id="google-pay-direct"></div>
-                <!-- <h3>Google Pay-PaymentForm</h3> -->
-                <!-- <div> -->
-                <!--   <button id="sq-google-pay" class="button-google-pay"></button> -->
-                <!-- </div> -->
-                <h3>Pay With Card</h3>
-                <div id="sq-card"></div>
-                <button class="button-credit-card" v-on:click="submitCardClick">
-                  Pay ${{ total_price }}
-                </button>
+                <form id="payment-form">
+                  <div id="card-container"></div>
+                  <button id="card-button" type="button">Pay ${{ total_price }}</button>
+                </form>
               </div>
             </div>
             <div class="content" v-if="payment_made">
